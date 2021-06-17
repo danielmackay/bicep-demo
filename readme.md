@@ -12,7 +12,8 @@ Created from following this tutorial: https://github.com/Azure/bicep/blob/main/d
 - converting arm templates
 
 ## Resources
-- https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/overview
-- https://github.com/Azure/bicep/tree/main/docs/examples
+- [Docs](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/)
+- [Examples](https://github.com/Azure/bicep/tree/main/docs/examples)
+- [Bicep Playground](https://bicepdemo.z22.web.core.windows.net/)
+- [VS Code Quickstart](https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/quickstart-create-bicep-use-visual-studio-code?tabs=CLI)
 - https://github.com/brydeno/BicepsOfSteel
-- https://bicepdemo.z22.web.core.windows.net/
