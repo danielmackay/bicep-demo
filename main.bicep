@@ -1,10 +1,16 @@
 param location string = resourceGroup().location
 param namePrefix string = 'stg'
 param globalRedundancy bool = false 
+param currentYear string = utcNow('yyyy') // format utc time to year only
+param containerNames array = [
+  'dogs'
+  'cats'
+  'fish'
+]
 
 var storageAccountName = '${namePrefix}${uniqueString(resourceGroup().id)}' // generates unique name based on resource group ID
 
-resource stg 'Microsoft.Storage/storageAccounts@2021-04-01' = {
+resource stg 'Microsoft.Storage/storageAccounts@2021-04-01' = if (currentYear == '2021') {
   name: storageAccountName
   location: location
   kind: 'Storage' 
@@ -13,12 +19,13 @@ resource stg 'Microsoft.Storage/storageAccounts@2021-04-01' = {
   }
 }
 
-resource blob 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-04-01' = {
-  name: '${stg.name}/default/logs'
+resource blob 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-04-01' = [for name in containerNames: {
+  name: '${stg.name}/default/${name}'
 // dependsOn will be added when the template is compiled
-}
+}]
 
 output storageId string = stg.id // output resourceId of storage account
 output computedStorageName string = stg.name
 output blobEndpoint string = stg.properties.primaryEndpoints.blob // replacement for reference(...).*
+output containerProps array = [for i in range(0, length(containerNames)): blob[i].id]
 
