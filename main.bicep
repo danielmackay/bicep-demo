@@ -1,4 +1,4 @@
-param location string = 'eastus'
+param location string = 'australiaeast'
 
 @minLength(3)
 @maxLength(24)
