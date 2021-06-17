@@ -1,17 +1,14 @@
-param location string = 'australiaeast'
+param location string = resourceGroup().location
+param namePrefix string = 'stg'
 
-@minLength(3)
-@maxLength(24)
-param storageAccountName string = 'uniquestorage001' // must be globally unique
-
-var storageSku = 'Standard_LRS' // declare variable and assign value
+param globalRedundancy bool = false 
 
 resource stg 'Microsoft.Storage/storageAccounts@2021-04-01' = {
-  name: storageAccountName
+  name: '${namePrefix}${uniqueString(resourceGroup().id)}' // generates unique name based on resource group ID
   location: location
   kind: 'Storage' 
   sku: {
-    name: storageSku // reference variable
+    name: globalRedundancy ? 'Standard_GRS' : 'Standard_LRS' // if true --> GRS, else --> LRS
   }
 }
 
