@@ -8,4 +8,8 @@ Created from following this tutorial: https://github.com/Azure/bicep/blob/main/d
 - using expressions
 - using symbolic resource names
 - loops, conditions, and existing checks
+- creating and consuming modules
 - converting arm templates
+
+## Resources
+- https://docs.microsoft.com/en-us/azure/azure-resource-manager/bicep/overview

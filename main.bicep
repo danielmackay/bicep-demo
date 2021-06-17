@@ -1,31 +1,29 @@
-param location string = resourceGroup().location
-param namePrefix string = 'stg'
-param globalRedundancy bool = false 
-param currentYear string = utcNow('yyyy') // format utc time to year only
-param containerNames array = [
-  'dogs'
-  'cats'
-  'fish'
-]
+targetScope = 'subscription'
 
-var storageAccountName = '${namePrefix}${uniqueString(resourceGroup().id)}' // generates unique name based on resource group ID
+param deployStorage bool = true
 
-resource stg 'Microsoft.Storage/storageAccounts@2021-04-01' = if (currentYear == '2021') {
-  name: storageAccountName
-  location: location
-  kind: 'Storage' 
-  sku: {
-    name: globalRedundancy ? 'Standard_GRS' : 'Standard_LRS' // if true --> GRS, else --> LRS
+@description('The object ID of the principal that will get the role assignment')
+param aadPrincipalId string
+
+module stg './storage.bicep' = if(deployStorage) {
+  name: 'storageDeploy'
+  scope: resourceGroup('another-rg') // this will target another resource group in the same subscription
+  params: {
+    storageAccountName: '<YOURUNIQUESTORAGENAME>'
   }
 }
 
-resource blob 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-04-01' = [for name in containerNames: {
-  name: '${stg.name}/default/${name}'
-// dependsOn will be added when the template is compiled
-}]
+var contributor = 'b24988ac-6180-42a0-ab88-20f7382dd24c'
+resource roleDef 'Microsoft.Authorization/roleDefinitions@2018-01-01-preview' existing = {
+  name: contributor
+}
 
-output storageId string = stg.id // output resourceId of storage account
-output computedStorageName string = stg.name
-output blobEndpoint string = stg.properties.primaryEndpoints.blob // replacement for reference(...).*
-output containerProps array = [for i in range(0, length(containerNames)): blob[i].id]
+resource rbac 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
+  name: guid(subscription().id, aadPrincipalId, contributor)
+  properties: {
+    roleDefinitionId: roleDef.id
+    principalId: aadPrincipalId
+  }
+}
 
+output storageName array = stg.outputs.containerProps
